@@ -120,7 +120,7 @@ void AsciiReader::onDataReady()
         // CLEMENT
         // NOTE : the line above does not remove internal whitespaces and must be completed
         // following line permits to remove internal whitespaces
-        if (valuesSeparator == ' ') // do not remove whitespaces if valueSeparator is a whitespace
+        if (valuesSeparator != ' ') // do not remove whitespaces if valueSeparator is a whitespace
         {
             line = line.replace(" ", "");
         }
