@@ -34,6 +34,10 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
             {
                 emit numOfChannelsChanged(value);
             });
+
+    connect(ui->spValuesSeparator, &QLineEdit::textChanged, this, &AsciiReaderSettings::onValuesSeparatorEdited);
+
+
 }
 
 AsciiReaderSettings::~AsciiReaderSettings()
@@ -44,4 +48,25 @@ AsciiReaderSettings::~AsciiReaderSettings()
 unsigned AsciiReaderSettings::numOfChannels()
 {
     return ui->spNumOfChannels->value();
+}
+
+void AsciiReaderSettings::onValuesSeparatorEdited()
+{
+    // TODO: emit with a delay so that error message doesn't flash!
+    emit valuesSeparatorChanged(syncValuesSeparator());
+}
+
+QChar AsciiReaderSettings::syncValuesSeparator()
+{
+    // You must avoid to read an empty line
+    QChar mychar;
+    if (ui->spValuesSeparator->text().length() != 0)
+    {
+        mychar = ui->spValuesSeparator->text().at(0);
+    }
+    else
+    {
+        mychar = DEFAULT_VALUES_SEPARATOR;
+    }
+    return mychar;
 }

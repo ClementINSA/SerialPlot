@@ -30,7 +30,7 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     paused = false;
     discardFirstLine = true;
     sampleCount = 0;
-    valuesSeparator = ',';
+    valuesSeparator = DEFAULT_VALUES_SEPARATOR;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
@@ -47,6 +47,10 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
             });
 
     connect(device, &QIODevice::aboutToClose, [this](){discardFirstLine=true;});
+
+    connect(&_settingsWidget, &AsciiReaderSettings::valuesSeparatorChanged,
+            this, &AsciiReader::onValuesSeparatorChanged);
+
 }
 
 QWidget* AsciiReader::settingsWidget()
@@ -178,4 +182,9 @@ void AsciiReader::onDataReady()
         }
         emit dataAdded();
     }
+}
+
+void AsciiReader::onValuesSeparatorChanged(QChar newSeparator)
+{
+    valuesSeparator = newSeparator;
 }

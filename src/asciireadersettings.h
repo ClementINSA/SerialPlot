@@ -21,6 +21,7 @@
 #define ASCIIREADERSETTINGS_H
 
 #include <QWidget>
+#define DEFAULT_VALUES_SEPARATOR ','
 
 namespace Ui {
 class AsciiReaderSettings;
@@ -35,12 +36,17 @@ public:
     ~AsciiReaderSettings();
 
     unsigned numOfChannels();
+    QChar syncValuesSeparator();
 
 signals:
     void numOfChannelsChanged(unsigned);
+    void valuesSeparatorChanged(QChar);
 
 private:
     Ui::AsciiReaderSettings *ui;
+
+private slots:
+    void onValuesSeparatorEdited();
 };
 
 #endif // ASCIIREADERSETTINGS_H

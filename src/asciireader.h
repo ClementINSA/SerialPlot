@@ -54,6 +54,7 @@ private:
 
 private slots:
     void onDataReady();
+    void onValuesSeparatorChanged(QChar);
 };
 
 #endif // ASCIIREADER_H
