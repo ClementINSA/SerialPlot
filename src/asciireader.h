@@ -32,7 +32,7 @@ public:
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);
-    void setvaluesSeparator (char newSeparator);
+    void setvaluesSeparator (QChar newSeparator);
 
 public slots:
     void pause(bool);
@@ -50,7 +50,7 @@ private:
 
     // CLEMENT
     // Permits a dynamic value separator
-    char valuesSeparator;
+    QChar valuesSeparator;
 
 private slots:
     void onDataReady();

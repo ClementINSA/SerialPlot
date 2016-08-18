@@ -90,7 +90,7 @@ void AsciiReader::pause(bool enabled)
 
 // CLEMENT
 // Permits to set the datas separator
-void AsciiReader::setvaluesSeparator(char newSeparator)
+void AsciiReader::setvaluesSeparator(QChar newSeparator)
 {
     valuesSeparator = newSeparator;
 }
@@ -136,7 +136,7 @@ void AsciiReader::onDataReady()
         // CLEMENT
         // Data separation with the valuesSeparator content (and not a default char)
         //auto separatedValues = line.split(',');
-        auto separatedValues = line.split(valuesSeparator);
+        auto separatedValues = line.split(valuesSeparator.toLatin1());
 
         unsigned numReadChannels; // effective number of channels to read
         unsigned numComingChannels = separatedValues.length();
