@@ -32,6 +32,7 @@ public:
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);
+    void setvaluesSeparator (char newSeparator);
 
 public slots:
     void pause(bool);
@@ -46,6 +47,10 @@ private:
     // We may have (usually true) started reading in the middle of a
     // line, so its a better idea to just discard first line.
     bool discardFirstLine;
+
+    // CLEMENT
+    // Permits a dynamic value separator
+    char valuesSeparator;
 
 private slots:
     void onDataReady();

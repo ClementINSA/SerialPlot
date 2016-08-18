@@ -30,6 +30,7 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     paused = false;
     discardFirstLine = true;
     sampleCount = 0;
+    valuesSeparator = ',';
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
@@ -86,6 +87,15 @@ void AsciiReader::pause(bool enabled)
     paused = enabled;
 }
 
+
+// CLEMENT
+// Permits to set the datas separator
+void AsciiReader::setvaluesSeparator(char newSeparator)
+{
+    valuesSeparator = newSeparator;
+}
+
+
 void AsciiReader::onDataReady()
 {
     while(_device->canReadLine())
@@ -107,6 +117,10 @@ void AsciiReader::onDataReady()
 
         // parse data
         line = line.trimmed();
+        // CLEMENT
+        // NOTE : the line above does not remove internal whitespaces and must be completed
+        // following line permits to remove internal whitespaces
+        line = line.replace(" ", "");
 
         // Note: When data coming from pseudo terminal is buffered by
         // system CR is converted to LF for some reason. This causes
@@ -116,7 +130,10 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        auto separatedValues = line.split(',');
+        // CLEMENT
+        // Data separation with the valuesSeparator content (and not a default char)
+        //auto separatedValues = line.split(',');
+        auto separatedValues = line.split(valuesSeparator);
 
         unsigned numReadChannels; // effective number of channels to read
         unsigned numComingChannels = separatedValues.length();
