@@ -120,7 +120,10 @@ void AsciiReader::onDataReady()
         // CLEMENT
         // NOTE : the line above does not remove internal whitespaces and must be completed
         // following line permits to remove internal whitespaces
-        line = line.replace(" ", "");
+        if (valuesSeparator == ' ') // do not remove whitespaces if valueSeparator is a whitespace
+        {
+            line = line.replace(" ", "");
+        }
 
         // Note: When data coming from pseudo terminal is buffered by
         // system CR is converted to LF for some reason. This causes
