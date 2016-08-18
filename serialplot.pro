@@ -23,7 +23,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport
+QT       += core gui serialport svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -118,7 +118,7 @@ FORMS += \
     src/binarystreamreadersettings.ui \
     src/asciireadersettings.ui
 
-INCLUDEPATH += qmake/ src/
+INCLUDEPATH += qmake/ src/ ../serialplot_qwt_compilation/build/qwt/include/
 
 CONFIG += c++11
 
@@ -127,3 +127,10 @@ RESOURCES += misc/icons.qrc
 win32 {
     RESOURCES += misc/winicons.qrc
 }
+
+unix:!macx: LIBS += -L$$PWD/../serialplot_qwt_compilation/build/qwt/lib/ -lqwt
+
+INCLUDEPATH += $$PWD/../serialplot_qwt_compilation/build/qwt/include
+DEPENDPATH += $$PWD/../serialplot_qwt_compilation/build/qwt/include
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../serialplot_qwt_compilation/build/qwt/lib/libqwt.a
