@@ -131,13 +131,28 @@ void AsciiReader::onDataReady()
 
         // parse data
         line = line.trimmed();
-        // CLEMENT
+
         // NOTE : the line above does not remove internal whitespaces and must be completed
         // following line permits to remove internal whitespaces
         if (valuesSeparator != ' ') // do not remove whitespaces if valueSeparator is a whitespace
         {
             line = line.replace(" ", "");
         }
+
+        // Removing from the line all the alphabetics caracters
+        char a = 97;
+        char A = 65;
+        for (int i = 0; i < 26; i++)
+        {
+            line = line.replace((char) a, "");
+            line = line.replace((char) A, "");
+            a = a+1;
+            A = A+1;
+        }
+
+        //For Debug Only
+        //onMessagePrinting(line.constData());
+
 
         // Note: When data coming from pseudo terminal is buffered by
         // system CR is converted to LF for some reason. This causes
