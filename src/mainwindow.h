@@ -43,6 +43,8 @@
 #include "channelmanager.h"
 #include "snapshotmanager.h"
 
+class DataFormatPanel;
+
 namespace Ui {
 class MainWindow;
 }
@@ -100,6 +102,9 @@ private slots:
     void enableDemo(bool enabled);
 
     void onExportCsv();
+
+    void printMessages(QString msg);
+
 };
 
 #endif // MAINWINDOW_H

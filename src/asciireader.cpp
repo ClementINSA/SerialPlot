@@ -18,6 +18,7 @@
 */
 
 #include <QtDebug>
+#include <iostream>
 
 #include "asciireader.h"
 
@@ -50,6 +51,8 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
 
     connect(&_settingsWidget, &AsciiReaderSettings::valuesSeparatorChanged,
             this, &AsciiReader::onValuesSeparatorChanged);
+
+
 
 }
 
@@ -102,9 +105,16 @@ void AsciiReader::setvaluesSeparator(QChar newSeparator)
 
 void AsciiReader::onDataReady()
 {
+
+
+
     while(_device->canReadLine())
     {
         QByteArray line = _device->readLine();
+
+        onMessagePrinting(line.constData());
+        std::cerr << (line.constData()) << std::endl;
+
 
         // discard only once when we just started reading
         if (discardFirstLine)
@@ -187,4 +197,9 @@ void AsciiReader::onDataReady()
 void AsciiReader::onValuesSeparatorChanged(QChar newSeparator)
 {
     valuesSeparator = newSeparator;
+}
+
+void AsciiReader::onMessagePrinting(QString Message)
+{
+    emit messagePrinting(Message);
 }

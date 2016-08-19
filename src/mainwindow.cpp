@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
+
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
 
@@ -150,6 +151,9 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::onChannelNameChanged);
 
     plotControlPanel.setChannelNamesModel(channelMan.channelNames());
+
+    // writing in the Log-Message window
+    connect(&dataFormatPanel.asciiReader, &AsciiReader::messagePrinting, this, &MainWindow::printMessages);
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -426,4 +430,9 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
+}
+
+void MainWindow::printMessages(QString msg)
+{
+    if (ui != NULL) ui->ptMessages->appendPlainText(msg);
 }

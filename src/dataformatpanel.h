@@ -59,6 +59,10 @@ signals:
     void samplesPerSecondChanged(unsigned);
     void dataAdded();
 
+public:
+    // I need to use asciiReader in mainwindow.cpp which is not possible with a private variable
+    AsciiReader asciiReader;
+
 private:
     Ui::DataFormatPanel *ui;
 
@@ -66,7 +70,6 @@ private:
     ChannelManager* _channelMan;
 
     BinaryStreamReader bsReader;
-    AsciiReader asciiReader;
     FramedReader framedReader;
     /// Currently selected reader
     AbstractReader* currentReader;

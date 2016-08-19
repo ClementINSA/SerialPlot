@@ -23,6 +23,7 @@
 #include "abstractreader.h"
 #include "asciireadersettings.h"
 
+
 class AsciiReader : public AbstractReader
 {
     Q_OBJECT
@@ -36,6 +37,9 @@ public:
 
 public slots:
     void pause(bool);
+
+signals :
+    void messagePrinting(QString);
 
 private:
     AsciiReaderSettings _settingsWidget;
@@ -55,6 +59,7 @@ private:
 private slots:
     void onDataReady();
     void onValuesSeparatorChanged(QChar);
+    void onMessagePrinting(QString);
 };
 
 #endif // ASCIIREADER_H

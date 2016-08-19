@@ -73,10 +73,19 @@
         </property>
         <item>
          <widget class="QPlainTextEdit" name="ptLog">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="ptMessages"/>
         </item>
        </layout>
       </widget>
@@ -90,7 +99,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
