@@ -172,6 +172,8 @@ void AsciiReader::onDataReady()
         }
 
         // parse read line
+        // parsing lines in normal sequence
+        /*
         for (unsigned ci = 0; ci < numReadChannels; ci++)
         {
             bool ok;
@@ -184,6 +186,43 @@ void AsciiReader::onDataReady()
             else
             {
                 qWarning() << "Data parsing error for channel: " << ci;
+            }
+        }
+        */
+
+        // parsing lines following user sequence's
+        // TODO : this part can be improved !
+        for (unsigned ci = 0; ci < numReadChannels; ci++)
+        {
+            int iUser;
+            if (ChannelsSequence.length() < numReadChannels)
+            {
+                // It's better to avoid to try to reach a non existing number
+                iUser = 0;
+            }
+            else
+            {
+                iUser = ChannelsSequence[ci];
+            }
+            if (iUser > 0 && iUser <= numReadChannels)
+            {
+                bool ok;
+                double channelSample = separatedValues[iUser-1].toDouble(&ok);
+                if (ok)
+                {
+                    _channelMan->addChannelData(ci, &channelSample, 1);
+                    sampleCount++;
+                }
+                else
+                {
+                    qWarning() << "Data parsing error for channel: " << ci;
+                }
+             }
+            else
+            {
+                double channelSample = 0;
+                _channelMan->addChannelData(ci, &channelSample, 1);
+                sampleCount++;
             }
         }
         emit dataAdded();
@@ -214,6 +253,8 @@ void AsciiReader::onChannelsSequenceChanged(QString line)
     else
     {
         line = treatLine(line);
+        // It can be interesting to remove also all non numeric characters (except ',')
+        line = line.remove((QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«».?/{}\'\"\\\[\\\]\\\\]"))));
         auto separatedValues = line.split(',');
 
         if (separatedValues.length() > ChannelsSequence.length())
