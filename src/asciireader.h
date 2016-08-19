@@ -20,9 +20,9 @@
 #ifndef ASCIIREADER_H
 #define ASCIIREADER_H
 
+
 #include "abstractreader.h"
 #include "asciireadersettings.h"
-
 
 class AsciiReader : public AbstractReader
 {
@@ -34,6 +34,7 @@ public:
     unsigned numOfChannels();
     void enable(bool enabled = true);
     void setvaluesSeparator (QChar newSeparator);
+    void setChannelsSequence (QString strChannelSequence);
 
 public slots:
     void pause(bool);
@@ -56,11 +57,20 @@ private:
     // Permits a dynamic value separator
     QChar valuesSeparator;
 
+    QVector<int> ChannelsSequence;
+    QVector<int> setDefaultChannelsSequence(int size);
+
     void printAsciiMessages (QString);
+
+    QString treatLine (QString line);
+
+    // for debug only
+    void printChannelsSequence (QVector<int>);
 
 private slots:
     void onDataReady();
     void onValuesSeparatorChanged(QChar);
+    void onChannelsSequenceChanged(QString);
     void onMessagePrinting(QString);
 };
 

@@ -37,6 +37,7 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
 
     connect(ui->spValuesSeparator, &QLineEdit::textChanged, this, &AsciiReaderSettings::onValuesSeparatorEdited);
 
+    connect(ui->spChannelsSequence, &QLineEdit::textChanged, this, &AsciiReaderSettings::onChannelsSequenceEdited);
 
 }
 
@@ -52,8 +53,12 @@ unsigned AsciiReaderSettings::numOfChannels()
 
 void AsciiReaderSettings::onValuesSeparatorEdited()
 {
-    // TODO: emit with a delay so that error message doesn't flash!
     emit valuesSeparatorChanged(syncValuesSeparator());
+}
+
+void AsciiReaderSettings::onChannelsSequenceEdited()
+{
+    emit channelsSequenceChanged(syncChannelsSequence());
 }
 
 QChar AsciiReaderSettings::syncValuesSeparator()
@@ -69,6 +74,11 @@ QChar AsciiReaderSettings::syncValuesSeparator()
         mychar = DEFAULT_VALUES_SEPARATOR;
     }
     return mychar;
+}
+
+QString AsciiReaderSettings::syncChannelsSequence()
+{
+    return ui->spChannelsSequence->text();
 }
 
 void AsciiReaderSettings::printAsciiMessages(QString msg)

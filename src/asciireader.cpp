@@ -24,6 +24,7 @@
 
 /// If set to this value number of channels is determined from input
 #define NUMOFCHANNELS_AUTO   (0)
+#define INITIALNUMOFCHANNELS     (5)
 
 AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
     AbstractReader(device, channelMan, parent)
@@ -32,6 +33,8 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     discardFirstLine = true;
     sampleCount = 0;
     valuesSeparator = DEFAULT_VALUES_SEPARATOR;
+    ChannelsSequence.resize(INITIALNUMOFCHANNELS);
+    ChannelsSequence = setDefaultChannelsSequence(ChannelsSequence.length());
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
@@ -52,7 +55,8 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     connect(&_settingsWidget, &AsciiReaderSettings::valuesSeparatorChanged,
             this, &AsciiReader::onValuesSeparatorChanged);
 
-
+    connect(&_settingsWidget, &AsciiReaderSettings::channelsSequenceChanged,
+            this, &AsciiReader::onChannelsSequenceChanged);
 
 }
 
@@ -129,26 +133,7 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        // parse data
-        line = line.trimmed();
-
-        // NOTE : the line above does not remove internal whitespaces and must be completed
-        // following line permits to remove internal whitespaces
-        if (valuesSeparator != ' ') // do not remove whitespaces if valueSeparator is a whitespace
-        {
-            line = line.replace(" ", "");
-        }
-
-        // Removing from the line all the alphabetics caracters
-        char a = 97;
-        char A = 65;
-        for (int i = 0; i < 26; i++)
-        {
-            line = line.replace((char) a, "");
-            line = line.replace((char) A, "");
-            a = a+1;
-            A = A+1;
-        }
+        line = treatLine(line).toLatin1();
 
         onMessagePrinting(line.constData());
 
@@ -160,9 +145,7 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        // CLEMENT
         // Data separation with the valuesSeparator content (and not a default char)
-        //auto separatedValues = line.split(',');
         auto separatedValues = line.split(valuesSeparator.toLatin1());
 
         unsigned numReadChannels; // effective number of channels to read
@@ -220,4 +203,92 @@ void AsciiReader::onMessagePrinting(QString Message)
 void AsciiReader::printAsciiMessages (QString msg)
 {
     _settingsWidget.printAsciiMessages(msg);
+}
+
+void AsciiReader::onChannelsSequenceChanged(QString line)
+{
+    if (line.isEmpty())
+    {
+        ChannelsSequence = setDefaultChannelsSequence(ChannelsSequence.length());
+    }
+    else
+    {
+        line = treatLine(line);
+        auto separatedValues = line.split(',');
+
+        if (separatedValues.length() > ChannelsSequence.length())
+        {
+            ChannelsSequence.resize(separatedValues.length());
+        }
+
+        for (int i = 0; i<separatedValues.length(); i++)
+        {
+            ChannelsSequence[i]=separatedValues[i].toInt();
+        }
+        for (int i = separatedValues.length(); i<ChannelsSequence.length(); i++)
+        {
+            ChannelsSequence[i]= 0;
+        }
+
+
+    }
+    // for debug only
+    printChannelsSequence(ChannelsSequence);
+}
+
+QVector<int> AsciiReader::setDefaultChannelsSequence(int size)
+{
+    QVector<int> mySequence(size);
+    // By default all channels must be printed in the "normal" sequence
+    for (int i = 0; i < size; i++)
+    {
+        mySequence[i] = i+1;
+    }
+    return mySequence;
+}
+
+// This function is used mainly for debbuging but can also be used to give more information to user
+void AsciiReader::printChannelsSequence(QVector<int> oneVector)
+{
+    printAsciiMessages("Channels Sequence has been set to : ");
+    QString str;
+    for (int i = 0; i < oneVector.size(); ++i)
+    {
+        if (i >= 0)
+        {
+            str += " ";
+            str += QString::number(oneVector[i]);
+        }
+    }
+    printAsciiMessages(str);
+}
+
+// This function permits to remove from the line given
+// -> EOL
+// -> whitespaces
+// -> non numeric characters
+QString AsciiReader::treatLine(QString line)
+{
+    // parse data
+    line = line.trimmed();
+
+    // NOTE : the line above does not remove internal whitespaces and must be completed
+    // following line permits to remove internal whitespaces
+    if (valuesSeparator != ' ') // do not remove whitespaces if valueSeparator is a whitespace
+    {
+        line = line.replace(" ", "");
+    }
+
+    // Removing from the line all the alphabetics caracters
+    char a = 97;
+    char A = 65;
+    for (int i = 0; i < 26; i++)
+    {
+        line = line.replace((char) a, "");
+        line = line.replace((char) A, "");
+        a = a+1;
+        A = A+1;
+    }
+
+    return line;
 }
