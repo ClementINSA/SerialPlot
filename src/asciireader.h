@@ -56,6 +56,8 @@ private:
     // Permits a dynamic value separator
     QChar valuesSeparator;
 
+    void printAsciiMessages (QString);
+
 private slots:
     void onDataReady();
     void onValuesSeparatorChanged(QChar);

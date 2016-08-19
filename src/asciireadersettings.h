@@ -38,6 +38,8 @@ public:
     unsigned numOfChannels();
     QChar syncValuesSeparator();
 
+    void printAsciiMessages(QString);
+
 signals:
     void numOfChannelsChanged(unsigned);
     void valuesSeparatorChanged(QChar);

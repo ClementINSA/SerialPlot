@@ -70,3 +70,8 @@ QChar AsciiReaderSettings::syncValuesSeparator()
     }
     return mychar;
 }
+
+void AsciiReaderSettings::printAsciiMessages(QString msg)
+{
+    if (ui != NULL) ui->ptAsciiMessages->appendPlainText(msg);
+}

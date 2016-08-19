@@ -112,7 +112,7 @@ void AsciiReader::onDataReady()
     {
         QByteArray line = _device->readLine();
 
-        onMessagePrinting(line.constData());
+        printAsciiMessages(line.constData());
         std::cerr << (line.constData()) << std::endl;
 
 
@@ -150,9 +150,7 @@ void AsciiReader::onDataReady()
             A = A+1;
         }
 
-        //For Debug Only
-        //onMessagePrinting(line.constData());
-
+        onMessagePrinting(line.constData());
 
         // Note: When data coming from pseudo terminal is buffered by
         // system CR is converted to LF for some reason. This causes
@@ -217,4 +215,9 @@ void AsciiReader::onValuesSeparatorChanged(QChar newSeparator)
 void AsciiReader::onMessagePrinting(QString Message)
 {
     emit messagePrinting(Message);
+}
+
+void AsciiReader::printAsciiMessages (QString msg)
+{
+    _settingsWidget.printAsciiMessages(msg);
 }
