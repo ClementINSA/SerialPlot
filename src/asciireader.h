@@ -36,6 +36,12 @@ public:
     void setvaluesSeparator (QChar newSeparator);
     void setChannelsSequence (QString strChannelSequence);
 
+    // to use trigger
+    void setTriggerStatus(bool);
+    void setTriggerLevel(int);
+    void setTriggerChannel(int);
+    void setTriggerType(bool);
+
 public slots:
     void pause(bool);
 
@@ -66,6 +72,12 @@ private:
 
     // for debug only
     void printChannelsSequence (QVector<int>);
+
+    // to use trigger
+    bool triggerStatus;
+    int triggerLevel;
+    int triggerChannel;
+    bool triggerType;
 
 private slots:
     void onDataReady();

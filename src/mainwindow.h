@@ -42,8 +42,8 @@
 #include "framebuffer.h"
 #include "channelmanager.h"
 #include "snapshotmanager.h"
+#include "triggersetting.h"
 
-class DataFormatPanel;
 
 namespace Ui {
 class MainWindow;
@@ -82,6 +82,8 @@ private:
     DataFormatPanel dataFormatPanel;
     PlotControlPanel plotControlPanel;
 
+    TriggerSetting triggerSetting;
+
     SnapshotManager snapshotMan;
 
     QwtPlotTextLabel demoIndicator;
@@ -104,6 +106,8 @@ private slots:
     void onExportCsv();
 
     void printMessages(QString msg);
+
+    void onTriggerUpdated();
 
 };
 

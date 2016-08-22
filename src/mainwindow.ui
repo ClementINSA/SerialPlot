@@ -123,8 +123,16 @@
      <string>View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuTrigger">
+    <property name="title">
+     <string>Trigger</string>
+    </property>
+    <addaction name="actionSetTrigger"/>
+    <addaction name="actionInfosTrigger"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuTrigger"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="plotToolBar">
@@ -204,6 +212,16 @@
    </property>
    <property name="toolTip">
     <string>Report a Bug on SerialPlot Website</string>
+   </property>
+  </action>
+  <action name="actionSetTrigger">
+   <property name="text">
+    <string>Trigger Settings</string>
+   </property>
+  </action>
+  <action name="actionInfosTrigger">
+   <property name="text">
+    <string>Trigger Infos</string>
    </property>
   </action>
  </widget>

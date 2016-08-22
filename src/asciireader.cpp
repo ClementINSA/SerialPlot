@@ -99,7 +99,6 @@ void AsciiReader::pause(bool enabled)
 }
 
 
-// CLEMENT
 // Permits to set the datas separator
 void AsciiReader::setvaluesSeparator(QChar newSeparator)
 {
@@ -332,4 +331,24 @@ QString AsciiReader::treatLine(QString line)
     }
 
     return line;
+}
+
+void AsciiReader::setTriggerStatus(bool newTriggerStatus)
+{
+    triggerStatus = newTriggerStatus;
+}
+
+void AsciiReader::setTriggerLevel(int newTriggerLevel)
+{
+    triggerLevel = newTriggerLevel;
+}
+
+void AsciiReader::setTriggerChannel(int newTriggerChannel)
+{
+    triggerChannel = newTriggerChannel;
+}
+
+void AsciiReader::setTriggerType(bool newTriggerType)
+{
+    triggerType = newTriggerType;
 }

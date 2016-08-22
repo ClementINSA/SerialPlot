@@ -134,6 +134,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionPause, &QAction::triggered,
                      &dataFormatPanel, &DataFormatPanel::pause);
 
+    // init Trigger menu
+    QObject::connect(ui->actionSetTrigger, &QAction::triggered,
+                         &triggerSetting, &QWidget::show);
+
     // init data arrays and plot
     numOfSamples = plotControlPanel.numOfSamples();
     unsigned numOfChannels = dataFormatPanel.numOfChannels();
@@ -154,6 +158,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // writing in the Log-Message window
     connect(&dataFormatPanel.asciiReader, &AsciiReader::messagePrinting, this, &MainWindow::printMessages);
+
+    // updating trigger settings
+    connect(&triggerSetting, &TriggerSetting::TriggerHasBeenUpdated, this, &MainWindow::onTriggerUpdated);
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -435,4 +442,13 @@ void MainWindow::messageHandler(QtMsgType type,
 void MainWindow::printMessages(QString msg)
 {
     if (ui != NULL) ui->ptMessages->appendPlainText(msg);
+}
+
+void MainWindow::onTriggerUpdated()
+{
+    // trigger status reading and writing in the adequate place
+    dataFormatPanel.asciiReader.setTriggerStatus(triggerSetting.readTriggerStatus());
+    dataFormatPanel.asciiReader.setTriggerLevel(triggerSetting.readTriggerLevel());
+    dataFormatPanel.asciiReader.setTriggerChannel(triggerSetting.readTriggerChannel());
+    dataFormatPanel.asciiReader.setTriggerType(triggerSetting.readcurrentTriggerType());
 }

@@ -65,7 +65,10 @@ SOURCES += \
     src/asciireadersettings.cpp \
     src/asciireader.cpp \
     src/demoreader.cpp \
-    src/framedreader.cpp
+    src/framedreader.cpp \
+    src/triggersetting.cpp \
+    src/triggerenable.cpp \
+    src/triggerdisable.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -101,7 +104,10 @@ HEADERS += \
     src/asciireadersettings.h \
     src/asciireader.h \
     src/demoreader.h \
-    src/framedreader.h
+    src/framedreader.h \
+    src/triggersetting.h \
+    src/triggerenable.h \
+    src/triggerdisable.h
 
 FORMS += \
     src/mainwindow.ui \
@@ -116,7 +122,10 @@ FORMS += \
     src/endiannessbox.ui \
     src/framedreadersettings.ui \
     src/binarystreamreadersettings.ui \
-    src/asciireadersettings.ui
+    src/asciireadersettings.ui \
+    src/triggersetting.ui \
+    src/triggerenable.ui \
+    src/triggerdisable.ui
 
 INCLUDEPATH += qmake/ src/ ../serialplot_qwt_compilation/build/qwt/include/
 
