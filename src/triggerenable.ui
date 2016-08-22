@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>95</height>
+    <width>457</width>
+    <height>153</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,27 +18,83 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>422</width>
-     <height>95</height>
+     <width>461</width>
+     <height>153</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="1">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="maximumSize">
+       <size>
+        <width>215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string># Channel associated to Trigger</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
      <widget class="QSpinBox" name="sbTriggerLevel">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="toolTip">
        <string/>
+      </property>
+      <property name="maximum">
+       <number>9999</number>
       </property>
      </widget>
     </item>
     <item row="0" column="1">
      <widget class="QSpinBox" name="sbTriggerChannel">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="toolTip">
        <string>Chose the # of the channel triggered</string>
+      </property>
+      <property name="maximum">
+       <number>30</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QSlider" name="horizontalSlider">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Choose the position on the plot of trigger releasing event</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
     <item row="1" column="1">
      <widget class="QComboBox" name="cbTriggerType">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <item>
        <property name="text">
         <string>On Trigger Overpassing</string>
@@ -51,22 +107,40 @@
       </item>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="maximumSize">
+       <size>
+        <width>215</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="text">
-       <string># Channel associated to Trigger</string>
+       <string>Trigger Position</string>
       </property>
      </widget>
     </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label_2">
+      <property name="maximumSize">
+       <size>
+        <width>215</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="text">
        <string>Acquisition starting...</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
+    <item row="2" column="0">
      <widget class="QLabel" name="label_3">
+      <property name="maximumSize">
+       <size>
+        <width>215</width>
+        <height>200</height>
+       </size>
+      </property>
       <property name="text">
        <string>Trigger Level</string>
       </property>

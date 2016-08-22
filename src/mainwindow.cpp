@@ -161,6 +161,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // updating trigger settings
     connect(&triggerSetting, &TriggerSetting::TriggerHasBeenUpdated, this, &MainWindow::onTriggerUpdated);
+    dataFormatPanel.asciiReader.setTriggerStatus(false);
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)

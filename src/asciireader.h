@@ -78,6 +78,11 @@ private:
     int triggerLevel;
     int triggerChannel;
     bool triggerType;
+    bool triggerLauch;
+    bool plotIsCleaned;
+    int remainingSamples;
+
+    bool cleanPlot();
 
 private slots:
     void onDataReady();

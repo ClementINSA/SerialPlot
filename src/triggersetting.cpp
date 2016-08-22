@@ -7,6 +7,7 @@ TriggerSetting::TriggerSetting(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    currentTriggerStatus = false;
     ui->rbEnableTrigger->setChecked(currentTriggerStatus);
 
     connect (ui->rbEnableTrigger, &QCheckBox::toggled, [this](bool checked)
@@ -27,7 +28,6 @@ TriggerSetting::TriggerSetting(QWidget *parent) :
     connect (ui->pbOk, SIGNAL (released()), this, SLOT (okButtonPressed()));
 
     connect (ui->pbCancel, SIGNAL (released()), this, SLOT (cancelButtonPressed()));
-
 }
 
 TriggerSetting::~TriggerSetting()
@@ -77,4 +77,3 @@ bool TriggerSetting::readcurrentTriggerType()
 {
     return currentTriggerType;
 }
-

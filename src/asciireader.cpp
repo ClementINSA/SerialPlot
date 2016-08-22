@@ -36,6 +36,9 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     ChannelsSequence.resize(INITIALNUMOFCHANNELS);
     ChannelsSequence = setDefaultChannelsSequence(ChannelsSequence.length());
 
+    triggerLauch = false;
+    plotIsCleaned = false;
+
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
 
@@ -116,7 +119,7 @@ void AsciiReader::onDataReady()
         QByteArray line = _device->readLine();
 
         printAsciiMessages(line.constData());
-        std::cerr << (line.constData()) << std::endl;
+        //std::cerr << (line.constData()) << std::endl;
 
 
         // discard only once when we just started reading
@@ -125,6 +128,10 @@ void AsciiReader::onDataReady()
             discardFirstLine = false;
             continue;
         }
+
+
+        // discard datas if not including REGEXP wanted
+
 
         // discard data if paused
         if (paused)
@@ -171,6 +178,7 @@ void AsciiReader::onDataReady()
         }
 
         // parse read line
+
         // parsing lines in normal sequence
         /*
         for (unsigned ci = 0; ci < numReadChannels; ci++)
@@ -191,40 +199,82 @@ void AsciiReader::onDataReady()
 
         // parsing lines following user sequence's
         // TODO : this part can be improved !
-        for (unsigned ci = 0; ci < numReadChannels; ci++)
+
+        if (triggerStatus == false || (triggerStatus == true && triggerLauch == true))
         {
-            int iUser;
-            if (ChannelsSequence.length() < numReadChannels)
+            for (unsigned ci = 0; ci < numReadChannels; ci++)
             {
-                // It's better to avoid to try to reach a non existing number
-                iUser = 0;
-            }
-            else
-            {
-                iUser = ChannelsSequence[ci];
-            }
-            if (iUser > 0 && iUser <= numReadChannels)
-            {
-                bool ok;
-                double channelSample = separatedValues[iUser-1].toDouble(&ok);
-                if (ok)
+                int iUser;
+                if (ChannelsSequence.length() < numReadChannels)
                 {
-                    _channelMan->addChannelData(ci, &channelSample, 1);
-                    sampleCount++;
+                    // It's better to avoid to try to reach a non existing number
+                    iUser = 0;
                 }
                 else
                 {
-                    qWarning() << "Data parsing error for channel: " << ci;
+                    iUser = ChannelsSequence[ci];
                 }
-             }
-            else
+
+                if (iUser > 0 && iUser <= numReadChannels)
+                {
+                    bool ok;
+                    // Ajouter la detection de vide
+                    double channelSample = separatedValues[iUser-1].toDouble(&ok);
+                    if (ok)
+                    {
+                        _channelMan->addChannelData(ci, &channelSample, 1);
+                        sampleCount++;
+                    }
+                    else
+                    {
+                        qWarning() << "Data parsing error for channel: " << ci;
+                    }
+                }
+                else
+                {
+                    double channelSample = 0;
+                    _channelMan->addChannelData(ci, &channelSample, 1);
+                    sampleCount++;
+                }
+            }
+            emit dataAdded();
+
+            // checking if we still have place to print (trigger used only)
+            remainingSamples --;
+            if (triggerStatus == true && remainingSamples < 1)
             {
-                double channelSample = 0;
-                _channelMan->addChannelData(ci, &channelSample, 1);
-                sampleCount++;
+                triggerLauch = false;
+                paused = true;
             }
         }
-        emit dataAdded();
+
+        else
+        {
+            // While Trigger is not satisfied, plot must be empty
+            if (plotIsCleaned != true) plotIsCleaned = cleanPlot();
+
+
+            // To start plotting, you have to wait until trigger lauching condition
+            bool ok;
+            double sample = separatedValues[0].toDouble(&ok);  // TODO : user can chose channel : we have to check his choice !!!!
+            if (ok)
+            {
+                if ((triggerType == true && sample > triggerLevel) || triggerType == false && sample < triggerLevel)
+                {
+                    triggerLauch = true;
+                    plotIsCleaned = false;
+                    remainingSamples = 500; // TODO : get number of samples
+                }
+            }
+            else
+            {
+                qWarning() << "Data parsing error for channel: " << 1;
+            }
+
+            // You have to plot until you have completly filled the window
+            // counting sample (place it in an another place)
+            // stopping (place it another place)
+        }
     }
 }
 
@@ -351,4 +401,18 @@ void AsciiReader::setTriggerChannel(int newTriggerChannel)
 void AsciiReader::setTriggerType(bool newTriggerType)
 {
     triggerType = newTriggerType;
+}
+
+bool AsciiReader::cleanPlot()
+{
+    double channelSample = 0;
+    for (int i = 0; i <_channelMan->numOfSamples(); i++)
+    {
+        for (int j = 0; j < _numOfChannels; j++)
+        {
+            _channelMan->addChannelData(j, &channelSample, 1);
+        }
+    }
+    emit dataAdded();
+    return true;
 }
