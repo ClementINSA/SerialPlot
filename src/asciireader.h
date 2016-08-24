@@ -63,8 +63,6 @@ private:
     // line, so its a better idea to just discard first line.
     bool discardFirstLine;
 
-    // CLEMENT
-    // Permits a dynamic value separator
     QChar valuesSeparator;
 
     QVector<int> channelsSequence;
@@ -91,6 +89,10 @@ private:
     bool triggerLauch;
     int remainingSamples;
 
+    // to use Regex
+    bool regexActivated;
+    QRegExp theRegexp;
+
     int checkUserChannel(int userChannel, int channelMax);
 
     bool cleanPlot();
@@ -100,6 +102,7 @@ private slots:
     void onValuesSeparatorChanged(QChar);
     void onChannelsSequenceChanged(QString);
     void onMessagePrinting(QString);
+    void onRegexChanged(QRegExp, bool);
 };
 
 #endif // ASCIIREADER_H

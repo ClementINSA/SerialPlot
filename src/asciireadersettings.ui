@@ -183,7 +183,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QCheckBox" name="cbKeepOnly">
+      <widget class="QCheckBox" name="cbRegexChecked">
        <property name="text">
         <string>Keep only lines with</string>
        </property>
@@ -205,6 +205,9 @@
        </property>
        <property name="toolTip">
         <string>Discard all the lines that do not match this regexp</string>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhLatinOnly|Qt::ImhSensitiveData</set>
        </property>
       </widget>
      </item>

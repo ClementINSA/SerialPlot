@@ -41,6 +41,9 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     triggerLauch = false;
     triggerLauch = false;
 
+    regexActivated = false;
+    theRegexp;
+
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
 
@@ -63,6 +66,7 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     connect(&_settingsWidget, &AsciiReaderSettings::channelsSequenceChanged,
             this, &AsciiReader::onChannelsSequenceChanged);
 
+    connect(&_settingsWidget, &AsciiReaderSettings::regexChanged, this, &AsciiReader::onRegexChanged);
 }
 
 QWidget* AsciiReader::settingsWidget()
@@ -137,12 +141,6 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        // removing unwanted characters
-        line = treatLine(line).toLatin1();
-
-        // log printing
-        onMessagePrinting(line.constData());
-
         // Note: When data coming from pseudo terminal is buffered by
         // system CR is converted to LF for some reason. This causes
         // empty lines in the input when the port is just opened.
@@ -150,6 +148,21 @@ void AsciiReader::onDataReady()
         {
             continue;
         }
+
+        // discard line if not matching with regex
+        if (regexActivated == true && theRegexp.indexIn(line.trimmed().constData()) == -1)
+        {
+            // for debug only
+            std::cerr << "line deleted";
+            std::cerr << line.constData()<< std::endl;
+            continue;
+        }
+
+        // removing unwanted characters
+        line = treatLine(line).toLatin1();
+
+        // log printing
+        onMessagePrinting(line.constData());
 
         // datas separation
         auto separatedValues = line.split(valuesSeparator.toLatin1());
@@ -303,6 +316,21 @@ void AsciiReader::onChannelsSequenceChanged(QString line)
     printChannelsSequence(channelsSequence);
 }
 
+void AsciiReader::onRegexChanged(QRegExp newRegex, bool newEnable)
+{
+    std::cerr << "regex updated" << std::endl;
+    if (newEnable == false)
+    {
+        regexActivated = false;
+        // in this case it is no use to change theRegexp
+    }
+    else
+    {
+        regexActivated = true;
+        theRegexp = newRegex;
+    }
+}
+
 QVector<int> AsciiReader::setDefaultChannelsSequence(int size)
 {
     QVector<int> mySequence(size);
@@ -420,14 +448,14 @@ QList<QByteArray> AsciiReader::reOrderChannels(QList<QByteArray> currentSequence
     for (int ci = 0; ci < numReadChannels; ci++)
     {
         int iUser;
-        if (channelsSequence.length() < numReadChannels)
+        if (newSequenceExpected.length() < numReadChannels)
         {
             // It's better to avoid to try to reach a non existing number
             iUser = 0;
         }
         else
         {
-            iUser = channelsSequence[ci];
+            iUser = newSequenceExpected[ci];
         }
 
         if (iUser > 0 && iUser <= numReadChannels)

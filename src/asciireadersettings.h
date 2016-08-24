@@ -38,6 +38,7 @@ public:
     unsigned numOfChannels();
     QChar syncValuesSeparator();
     QString syncChannelsSequence();
+    QRegExp syncRegex();
 
     void printAsciiMessages(QString);
 
@@ -45,6 +46,7 @@ signals:
     void numOfChannelsChanged(unsigned);
     void channelsSequenceChanged(QString);
     void valuesSeparatorChanged(QChar);
+    void regexChanged(QRegExp, bool);
 
 private:
     Ui::AsciiReaderSettings *ui;
@@ -52,6 +54,8 @@ private:
 private slots:
     void onValuesSeparatorEdited();
     void onChannelsSequenceEdited();
+    void onRegexEdited();
+    void onRegexChecked(bool);
 };
 
 #endif // ASCIIREADERSETTINGS_H

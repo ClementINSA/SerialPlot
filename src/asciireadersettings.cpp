@@ -39,6 +39,10 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
 
     connect(ui->spChannelsSequence, &QLineEdit::textChanged, this, &AsciiReaderSettings::onChannelsSequenceEdited);
 
+    connect(ui->spRegex, &QLineEdit::textChanged, this, &AsciiReaderSettings::onRegexEdited);
+
+    connect(ui->cbRegexChecked, SIGNAL (toggled(bool)), this, SLOT (onRegexChecked(bool)));
+
 }
 
 AsciiReaderSettings::~AsciiReaderSettings()
@@ -61,6 +65,32 @@ void AsciiReaderSettings::onChannelsSequenceEdited()
     emit channelsSequenceChanged(syncChannelsSequence());
 }
 
+void AsciiReaderSettings::onRegexEdited()
+{
+    if(ui->cbRegexChecked->isChecked())
+    {
+        emit regexChanged(syncRegex(), true);
+    }
+    else
+    {
+        QRegExp null;
+        emit regexChanged(null, false);
+    }
+}
+
+void AsciiReaderSettings::onRegexChecked(bool)
+{
+    if(ui->cbRegexChecked->isChecked())
+    {
+        emit regexChanged(syncRegex(), true);
+    }
+    else
+    {
+        QRegExp null;
+        emit regexChanged(null, false);
+    }
+}
+
 QChar AsciiReaderSettings::syncValuesSeparator()
 {
     // You must avoid to read an empty line
@@ -79,6 +109,12 @@ QChar AsciiReaderSettings::syncValuesSeparator()
 QString AsciiReaderSettings::syncChannelsSequence()
 {
     return ui->spChannelsSequence->text();
+}
+
+QRegExp AsciiReaderSettings::syncRegex()
+{
+    QRegExp myRegexp(ui->spRegex->text());
+    return myRegexp;
 }
 
 void AsciiReaderSettings::printAsciiMessages(QString msg)
