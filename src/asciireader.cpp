@@ -33,11 +33,13 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     discardFirstLine = true;
     sampleCount = 0;
     valuesSeparator = DEFAULT_VALUES_SEPARATOR;
-    ChannelsSequence.resize(INITIALNUMOFCHANNELS);
-    ChannelsSequence = setDefaultChannelsSequence(ChannelsSequence.length());
+    channelsSequence.resize(INITIALNUMOFCHANNELS);
+    channelsSequence = setDefaultChannelsSequence(channelsSequence.length());
+
+    remainingSamples = 100;
 
     triggerLauch = false;
-    plotIsCleaned = false;
+    triggerLauch = false;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
@@ -129,18 +131,16 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-
-        // discard datas if not including REGEXP wanted
-
-
         // discard data if paused
         if (paused)
         {
             continue;
         }
 
+        // removing unwanted characters
         line = treatLine(line).toLatin1();
 
+        // log printing
         onMessagePrinting(line.constData());
 
         // Note: When data coming from pseudo terminal is buffered by
@@ -151,12 +151,12 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        // Data separation with the valuesSeparator content (and not a default char)
+        // datas separation
         auto separatedValues = line.split(valuesSeparator.toLatin1());
 
+        // channels counting
         unsigned numReadChannels; // effective number of channels to read
         unsigned numComingChannels = separatedValues.length();
-
         if (autoNumOfChannels)
         {
             // did number of channels changed?
@@ -177,11 +177,11 @@ void AsciiReader::onDataReady()
             qWarning() << "Incoming data is missing data for some channels!";
         }
 
-        // parse read line
+        // parsing read line
+        separatedValues = reOrderChannels(separatedValues, channelsSequence, numReadChannels);
 
-        // parsing lines in normal sequence
-        /*
-        for (unsigned ci = 0; ci < numReadChannels; ci++)
+        // ploting datas
+        for (int ci = 0; ci < numReadChannels; ci++)
         {
             bool ok;
             double channelSample = separatedValues[ci].toDouble(&ok);
@@ -192,88 +192,65 @@ void AsciiReader::onDataReady()
             }
             else
             {
+                // To get a better plotting, we print a 0 if a data is not correct
+                channelSample = 0;
                 qWarning() << "Data parsing error for channel: " << ci;
+                _channelMan->addChannelData(ci, &channelSample, 1);
+                sampleCount++;
             }
         }
-        */
+        emit dataAdded();
 
-        // parsing lines following user sequence's
-        // TODO : this part can be improved !
-
-        if (triggerStatus == false || (triggerStatus == true && triggerLauch == true))
+        // counting remaining samples to plot
+        if (triggerStatus == true && triggerLauch == true)
         {
-            for (unsigned ci = 0; ci < numReadChannels; ci++)
-            {
-                int iUser;
-                if (ChannelsSequence.length() < numReadChannels)
-                {
-                    // It's better to avoid to try to reach a non existing number
-                    iUser = 0;
-                }
-                else
-                {
-                    iUser = ChannelsSequence[ci];
-                }
-
-                if (iUser > 0 && iUser <= numReadChannels)
-                {
-                    bool ok;
-                    // Ajouter la detection de vide
-                    double channelSample = separatedValues[iUser-1].toDouble(&ok);
-                    if (ok)
-                    {
-                        _channelMan->addChannelData(ci, &channelSample, 1);
-                        sampleCount++;
-                    }
-                    else
-                    {
-                        qWarning() << "Data parsing error for channel: " << ci;
-                    }
-                }
-                else
-                {
-                    double channelSample = 0;
-                    _channelMan->addChannelData(ci, &channelSample, 1);
-                    sampleCount++;
-                }
-            }
-            emit dataAdded();
-
-            // checking if we still have place to print (trigger used only)
             remainingSamples --;
-            if (triggerStatus == true && remainingSamples < 1)
-            {
-                triggerLauch = false;
-                paused = true;
-            }
         }
-
         else
         {
-            // While Trigger is not satisfied, plot must be empty
-            if (plotIsCleaned != true) plotIsCleaned = cleanPlot();
+            remainingSamples = 100;
+        }
 
 
-            // To start plotting, you have to wait until trigger lauching condition
+        // checking lauching conditions of trigger
+        if (triggerLauch == false && triggerStatus == true)
+        {
+            // 2 conditions : "prelauching" condition and lauching condition
+            // for Overpassing : trigger must first go under the start condition and then go over
+            // for Underpassing : trigger must first go over the start condition and then go under
             bool ok;
-            double sample = separatedValues[0].toDouble(&ok);  // TODO : user can chose channel : we have to check his choice !!!!
+            int channelToWatch = checkUserChannel(triggerChannel, numReadChannels);
+            double sample = separatedValues[channelToWatch].toDouble(&ok);  // TODO : user can chose channel : we have to check his choice !!!!
             if (ok)
             {
-                if ((triggerType == true && sample > triggerLevel) || triggerType == false && sample < triggerLevel)
+                if (triggerPreLauch == false)
                 {
-                    triggerLauch = true;
-                    plotIsCleaned = false;
-                    remainingSamples = 500; // TODO : get number of samples
+                    if ((triggerType == true && sample < triggerLevel) || (triggerType == false && sample > triggerLevel))
+                    {
+                        triggerPreLauch = true;
+                    }
+                }
+                else
+                {
+                    if ((triggerType == true && sample > triggerLevel) || (triggerType == false && sample < triggerLevel))
+                    {
+                        triggerLauch = true;
+                        remainingSamples = (triggerWindowSize - (triggerPosition*triggerWindowSize)/100);
+                        triggerPreLauch = false;
+                    }
                 }
             }
-            else
-            {
-                qWarning() << "Data parsing error for channel: " << 1;
-            }
+        }
 
-            // You have to plot until you have completly filled the window
-            // counting sample (place it in an another place)
-            // stopping (place it another place)
+        // stoping plotting if all expected samples have been plotted
+        if (remainingSamples<1)
+        {
+            // STOP !!!!
+            triggerLauch = false;
+            paused = true;
+            pause(true);
+            emit triggerHasFinished();
+            remainingSamples = 100;
         }
     }
 }
@@ -297,7 +274,7 @@ void AsciiReader::onChannelsSequenceChanged(QString line)
 {
     if (line.isEmpty())
     {
-        ChannelsSequence = setDefaultChannelsSequence(ChannelsSequence.length());
+        channelsSequence = setDefaultChannelsSequence(channelsSequence.length());
     }
     else
     {
@@ -306,24 +283,24 @@ void AsciiReader::onChannelsSequenceChanged(QString line)
         line = line.remove((QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«».?/{}\'\"\\\[\\\]\\\\]"))));
         auto separatedValues = line.split(',');
 
-        if (separatedValues.length() > ChannelsSequence.length())
+        if (separatedValues.length() > channelsSequence.length())
         {
-            ChannelsSequence.resize(separatedValues.length());
+            channelsSequence.resize(separatedValues.length());
         }
 
         for (int i = 0; i<separatedValues.length(); i++)
         {
-            ChannelsSequence[i]=separatedValues[i].toInt();
+            channelsSequence[i]=separatedValues[i].toInt();
         }
-        for (int i = separatedValues.length(); i<ChannelsSequence.length(); i++)
+        for (int i = separatedValues.length(); i<channelsSequence.length(); i++)
         {
-            ChannelsSequence[i]= 0;
+            channelsSequence[i]= 0;
         }
 
 
     }
     // for debug only
-    printChannelsSequence(ChannelsSequence);
+    printChannelsSequence(channelsSequence);
 }
 
 QVector<int> AsciiReader::setDefaultChannelsSequence(int size)
@@ -403,6 +380,22 @@ void AsciiReader::setTriggerType(bool newTriggerType)
     triggerType = newTriggerType;
 }
 
+void AsciiReader::setTriggerPosition(int position)
+{
+    triggerPosition = position;
+}
+
+void AsciiReader::setTriggerWindowSize(int windowSize)
+{
+    triggerWindowSize = windowSize;
+}
+
+void AsciiReader::setTriggerLauch(bool lauch)
+{
+    triggerLauch = lauch;
+    triggerPreLauch = lauch;
+}
+
 bool AsciiReader::cleanPlot()
 {
     double channelSample = 0;
@@ -415,4 +408,47 @@ bool AsciiReader::cleanPlot()
     }
     emit dataAdded();
     return true;
+}
+
+QList<QByteArray> AsciiReader::reOrderChannels(QList<QByteArray> currentSequenceChannels, QVector<int> newSequenceExpected, int numReadChannels)
+{
+    // The purpose fo this function is to change the content of normalSequenceChannels to
+    // match with the newSequenceExpected by the user
+    // If the given sequence can be reached, some small changes will be made.
+    QList<QByteArray> reOrderredChannels = currentSequenceChannels;
+
+    for (int ci = 0; ci < numReadChannels; ci++)
+    {
+        int iUser;
+        if (channelsSequence.length() < numReadChannels)
+        {
+            // It's better to avoid to try to reach a non existing number
+            iUser = 0;
+        }
+        else
+        {
+            iUser = channelsSequence[ci];
+        }
+
+        if (iUser > 0 && iUser <= numReadChannels)
+        {
+            // users count from 1, computers from 0
+            reOrderredChannels[ci] = currentSequenceChannels[iUser-1];
+        }
+        else
+        {
+            reOrderredChannels[ci] = 0;
+        }
+    }
+    return reOrderredChannels;
+}
+
+int AsciiReader::checkUserChannel(int userChannel, int channelMax)
+{
+    // If user channel is reachable, give back the user channel (shift by 1 cause user count from 1)
+    // If not give back 0 (whatever happens, channel 0 exists)
+    int newChannel;
+    if (userChannel > 0 && userChannel < channelMax) newChannel = userChannel - 1;
+    else newChannel = 0;
+    return newChannel;
 }

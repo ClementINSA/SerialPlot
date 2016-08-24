@@ -109,6 +109,8 @@ private slots:
 
     void onTriggerUpdated();
 
+    void onTriggerFinished();
+
 };
 
 #endif // MAINWINDOW_H

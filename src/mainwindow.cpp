@@ -54,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dataFormatPanel(&serialPort, &channelMan),
     snapshotMan(this, &channelMan)
 {
+    numOfSamples = 1000;
+
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -137,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // init Trigger menu
     QObject::connect(ui->actionSetTrigger, &QAction::triggered,
                          &triggerSetting, &QWidget::show);
+    triggerSetting.updateWindowSize(numOfSamples);
 
     // init data arrays and plot
     numOfSamples = plotControlPanel.numOfSamples();
@@ -162,6 +165,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // updating trigger settings
     connect(&triggerSetting, &TriggerSetting::TriggerHasBeenUpdated, this, &MainWindow::onTriggerUpdated);
     dataFormatPanel.asciiReader.setTriggerStatus(false);
+
+    // stop plotting when trigger is finished
+    connect(&dataFormatPanel.asciiReader, &AsciiReader::triggerHasFinished, this, &MainWindow::onTriggerFinished);
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -311,6 +317,10 @@ void MainWindow::onNumOfSamplesChanged(int value)
     numOfSamples = value;
     channelMan.setNumOfSamples(value);
     ui->plot->replot();
+
+    // Trigger Settings must also be updated
+    dataFormatPanel.asciiReader.setTriggerWindowSize(value);
+    triggerSetting.updateWindowSize(value);
 }
 
 void MainWindow::onNumOfChannelsChanged(unsigned value)
@@ -451,5 +461,20 @@ void MainWindow::onTriggerUpdated()
     dataFormatPanel.asciiReader.setTriggerStatus(triggerSetting.readTriggerStatus());
     dataFormatPanel.asciiReader.setTriggerLevel(triggerSetting.readTriggerLevel());
     dataFormatPanel.asciiReader.setTriggerChannel(triggerSetting.readTriggerChannel());
-    dataFormatPanel.asciiReader.setTriggerType(triggerSetting.readcurrentTriggerType());
+    dataFormatPanel.asciiReader.setTriggerType(triggerSetting.readTriggerType());
+    dataFormatPanel.asciiReader.setTriggerPosition(triggerSetting.readTriggerPosition());
+    dataFormatPanel.asciiReader.setTriggerWindowSize(plotControlPanel.numOfSamples());
+
+    // To restart an acquisition
+    ui->actionPause->setChecked(false);
+    dataFormatPanel.pause(false);
+
+    // To stop plotting before trigger lauching
+    dataFormatPanel.asciiReader.setTriggerLauch(false);
 }
+
+void MainWindow::onTriggerFinished()
+{
+    ui->actionPause->setChecked(true);
+}
+

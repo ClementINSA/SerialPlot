@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>492</width>
+    <width>506</width>
     <height>290</height>
    </rect>
   </property>
@@ -31,7 +31,7 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>471</width>
+     <width>481</width>
      <height>191</height>
     </rect>
    </property>
@@ -44,7 +44,7 @@
   <widget class="QPushButton" name="pbOk">
    <property name="geometry">
     <rect>
-     <x>80</x>
+     <x>40</x>
      <y>250</y>
      <width>99</width>
      <height>27</height>
@@ -57,7 +57,7 @@
   <widget class="QPushButton" name="pbCancel">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>150</x>
      <y>250</y>
      <width>99</width>
      <height>27</height>
@@ -65,6 +65,32 @@
    </property>
    <property name="text">
     <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbApply">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>250</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Apply</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbUnpause">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>250</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Unpause</string>
    </property>
   </widget>
  </widget>

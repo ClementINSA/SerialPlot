@@ -19,7 +19,10 @@ public:
     bool readTriggerStatus();
     int readTriggerLevel();
     int readTriggerChannel();
-    bool readcurrentTriggerType();
+    bool readTriggerType();
+    int readTriggerPosition();
+
+    void updateWindowSize(int);
 
     ~TriggerSetting();
 
@@ -33,6 +36,8 @@ private:
     int currentTriggerLevel;
     int currentTriggerChannel;
     bool currentTriggerType;
+    int currentTriggerPosition;
+    int windowPlotSize;
 
     void updateTriggerSettings();
 
@@ -43,6 +48,8 @@ signals:
 private slots:
     void okButtonPressed();
     void cancelButtonPressed();
+    void applyButtonPressed();
+    void unpauseButtonPressed();
 };
 
 #endif // TRIGGERSETTING_H

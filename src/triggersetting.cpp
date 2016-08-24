@@ -8,6 +8,7 @@ TriggerSetting::TriggerSetting(QWidget *parent) :
     ui->setupUi(this);
 
     currentTriggerStatus = false;
+
     ui->rbEnableTrigger->setChecked(currentTriggerStatus);
 
     connect (ui->rbEnableTrigger, &QCheckBox::toggled, [this](bool checked)
@@ -17,9 +18,12 @@ TriggerSetting::TriggerSetting(QWidget *parent) :
             if (checked)
             {
                 triggerEnable.setEnabled(true);
-                triggerEnable.defaultTriggerChannel(currentTriggerChannel);
-                triggerEnable.defaultTriggerLevel(currentTriggerLevel);
-                triggerEnable.defaultTriggerType(currentTriggerType);
+                triggerEnable.defaultTriggerChannel(1);
+                triggerEnable.defaultTriggerLevel(0);
+                triggerEnable.defaultTriggerType(true);
+                triggerEnable.defaultTriggerPosition(50);
+
+                triggerEnable.setCurrentNumberOfSamples(windowPlotSize);
             }
 
             else triggerEnable.setEnabled(false);
@@ -28,6 +32,10 @@ TriggerSetting::TriggerSetting(QWidget *parent) :
     connect (ui->pbOk, SIGNAL (released()), this, SLOT (okButtonPressed()));
 
     connect (ui->pbCancel, SIGNAL (released()), this, SLOT (cancelButtonPressed()));
+
+    connect (ui->pbApply, SIGNAL (released()), this, SLOT (applyButtonPressed()));
+
+    connect (ui->pbUnpause, SIGNAL (released()), this, SLOT (unpauseButtonPressed()));
 }
 
 TriggerSetting::~TriggerSetting()
@@ -49,6 +57,7 @@ void TriggerSetting::okButtonPressed()
     currentTriggerLevel = triggerEnable.newTriggerLevel();
     currentTriggerChannel = triggerEnable.newTriggerChannel();
     currentTriggerType = triggerEnable.newTriggerType();
+    currentTriggerPosition = triggerEnable.newTriggerPosition();
     emit TriggerHasBeenUpdated();
     this->hide();
 }
@@ -56,6 +65,26 @@ void TriggerSetting::okButtonPressed()
 void TriggerSetting::cancelButtonPressed()
 {
     this->hide();
+}
+
+void TriggerSetting::applyButtonPressed()
+{
+    currentTriggerStatus = newTriggerStatus();
+    currentTriggerLevel = triggerEnable.newTriggerLevel();
+    currentTriggerChannel = triggerEnable.newTriggerChannel();
+    currentTriggerType = triggerEnable.newTriggerType();
+    currentTriggerPosition = triggerEnable.newTriggerPosition();
+    emit TriggerHasBeenUpdated();
+}
+
+void TriggerSetting::unpauseButtonPressed()
+{
+    currentTriggerStatus = newTriggerStatus();
+    currentTriggerLevel = triggerEnable.newTriggerLevel();
+    currentTriggerChannel = triggerEnable.newTriggerChannel();
+    currentTriggerType = triggerEnable.newTriggerType();
+    currentTriggerPosition = triggerEnable.newTriggerPosition();
+    emit TriggerHasBeenUpdated();
 }
 
 bool TriggerSetting::readTriggerStatus()
@@ -73,7 +102,18 @@ int TriggerSetting::readTriggerChannel()
     return currentTriggerChannel;
 }
 
-bool TriggerSetting::readcurrentTriggerType()
+bool TriggerSetting::readTriggerType()
 {
     return currentTriggerType;
+}
+
+int TriggerSetting::readTriggerPosition()
+{
+    return currentTriggerPosition;
+}
+
+void TriggerSetting::updateWindowSize(int newSize)
+{
+    windowPlotSize = newSize;
+    triggerEnable.setCurrentNumberOfSamples(newSize);
 }

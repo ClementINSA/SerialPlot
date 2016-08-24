@@ -41,12 +41,16 @@ public:
     void setTriggerLevel(int);
     void setTriggerChannel(int);
     void setTriggerType(bool);
+    void setTriggerPosition(int);
+    void setTriggerWindowSize(int);
+    void setTriggerLauch (bool);
 
 public slots:
     void pause(bool);
 
 signals :
     void messagePrinting(QString);
+    void triggerHasFinished();
 
 private:
     AsciiReaderSettings _settingsWidget;
@@ -63,8 +67,10 @@ private:
     // Permits a dynamic value separator
     QChar valuesSeparator;
 
-    QVector<int> ChannelsSequence;
+    QVector<int> channelsSequence;
     QVector<int> setDefaultChannelsSequence(int size);
+
+    QList<QByteArray> reOrderChannels(QList<QByteArray>, QVector<int>, int);
 
     void printAsciiMessages (QString);
 
@@ -78,9 +84,14 @@ private:
     int triggerLevel;
     int triggerChannel;
     bool triggerType;
+    int triggerPosition;
+    int triggerWindowSize;
+
+    bool triggerPreLauch;
     bool triggerLauch;
-    bool plotIsCleaned;
     int remainingSamples;
+
+    int checkUserChannel(int userChannel, int channelMax);
 
     bool cleanPlot();
 

@@ -18,15 +18,24 @@ public:
     void defaultTriggerChannel(int channel);
     void defaultTriggerLevel(int level);
     void defaultTriggerType(bool type);
+    void defaultTriggerPosition(int position);
 
     int newTriggerChannel();
     int newTriggerLevel();
     bool newTriggerType(); // true = overpassing   false = underpassing
+    int newTriggerPosition();
+
+    void setCurrentNumberOfSamples (int);
 
     ~TriggerEnable();
 
 private:
     Ui::TriggerEnable *ui;
+
+    int currentNumberOfSamples;
+
+private slots:
+    void onSliderModified(int sliderPosition);
 };
 
 #endif // TRIGGERENABLE_H
