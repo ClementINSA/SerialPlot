@@ -68,7 +68,8 @@ SOURCES += \
     src/framedreader.cpp \
     src/triggersetting.cpp \
     src/triggerenable.cpp \
-    src/triggerdisable.cpp
+    src/triggerdisable.cpp \
+    src/resizingdatas.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -107,7 +108,8 @@ HEADERS += \
     src/framedreader.h \
     src/triggersetting.h \
     src/triggerenable.h \
-    src/triggerdisable.h
+    src/triggerdisable.h \
+    src/resizingdatas.h
 
 FORMS += \
     src/mainwindow.ui \

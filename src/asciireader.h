@@ -23,6 +23,7 @@
 
 #include "abstractreader.h"
 #include "asciireadersettings.h"
+#include "resizingdatas.h"
 
 class AsciiReader : public AbstractReader
 {
@@ -45,6 +46,10 @@ public:
     void setTriggerWindowSize(int);
     void setTriggerLauch (bool);
 
+    // to use data resizing
+    void modifyDataResizerSettings (int channel, bool b, int a, float m);
+    void putChannelsInDataResizerSelector ();
+
 public slots:
     void pause(bool);
 
@@ -65,6 +70,7 @@ private:
 
     QChar valuesSeparator;
 
+    // for changing channels order
     QVector<int> channelsSequence;
     QVector<int> setDefaultChannelsSequence(int size);
 
@@ -95,6 +101,11 @@ private:
 
     int checkUserChannel(int userChannel, int channelMax);
 
+    // to use data resizing
+    QMap <int,ResizingDatas> dataResizerSettings;
+    QList<QByteArray> reSizeChannels (QList<QByteArray>, QMap <int,ResizingDatas>);
+
+    // finally unused
     bool cleanPlot();
 
 private slots:
@@ -103,6 +114,8 @@ private slots:
     void onChannelsSequenceChanged(QString);
     void onMessagePrinting(QString);
     void onRegexChanged(QRegExp, bool);
+    void onDataResizingSettingsChanged(int channel, bool activated, int adder, float multiplier);
+    void onDataResizingChannelChanged(int channelda);
 };
 
 #endif // ASCIIREADER_H

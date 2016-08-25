@@ -22,11 +22,19 @@
 #include "asciireadersettings.h"
 #include "ui_asciireadersettings.h"
 
+//debug only
+#include <iostream>
+
+
 AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AsciiReaderSettings)
 {
     ui->setupUi(this);
+
+    putChannelsInDataResizerSelector(1);
+
+    previousIndex = ui->cbChannels->currentIndex();
 
     // Note: if directly connected we get a runtime warning on incompatible signal arguments
     connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
@@ -42,6 +50,12 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
     connect(ui->spRegex, &QLineEdit::textChanged, this, &AsciiReaderSettings::onRegexEdited);
 
     connect(ui->cbRegexChecked, SIGNAL (toggled(bool)), this, SLOT (onRegexChecked(bool)));
+
+    connect(ui->cbChannels, SIGNAL (currentIndexChanged(int)), this, SLOT (onDataResizingChannelChanged(int)));
+
+    connect(ui->cbEnableResizing, &QCheckBox::toggled, this, &AsciiReaderSettings::onDataResizingChanged); // not sure to be good
+    connect(ui->sbAdder, &QSpinBox::editingFinished, this, &AsciiReaderSettings::onDataResizingChanged);
+    connect(ui->sbMultiplicator, &QSpinBox::editingFinished, this, &AsciiReaderSettings::onDataResizingChanged);
 
 }
 
@@ -91,6 +105,34 @@ void AsciiReaderSettings::onRegexChecked(bool)
     }
 }
 
+void AsciiReaderSettings::onDataResizingChanged()
+{
+    int c = ui->cbChannels->currentIndex();
+    bool b = ui->cbEnableResizing->isChecked();
+    int a = ui->sbAdder->value();
+    float m = ui->sbMultiplicator->value();
+
+    emit dataResizingChanged(c, b, a, m);
+}
+
+void AsciiReaderSettings::onDataResizingChannelChanged(int channel)
+{
+    // send current datas
+    int c = previousIndex;
+    bool b = ui->cbEnableResizing->isChecked();
+    int a = ui->sbAdder->value();
+    float m = ui->sbMultiplicator->value();
+
+    emit dataResizingChanged(c, b, a, m);
+
+    // to keep in mind where we are
+    previousIndex = channel;
+
+    // restaure datas inrelationship with this channel (as datas are in AsciiReader)
+    emit dataResizingCurrentChannelChanged(channel);
+
+}
+
 QChar AsciiReaderSettings::syncValuesSeparator()
 {
     // You must avoid to read an empty line
@@ -120,4 +162,44 @@ QRegExp AsciiReaderSettings::syncRegex()
 void AsciiReaderSettings::printAsciiMessages(QString msg)
 {
     if (ui != NULL) ui->ptAsciiMessages->appendPlainText(msg);
+}
+
+void AsciiReaderSettings::putChannelsInDataResizerSelector(int numberOfChannelsToPrint)
+{
+    int currentNumberOfChannelsPrinted = ui->cbChannels->count();
+
+    if (currentNumberOfChannelsPrinted == numberOfChannelsToPrint)
+    {
+        // do nothing : all is right
+    }
+    else
+    {
+        if (currentNumberOfChannelsPrinted < numberOfChannelsToPrint)
+        {
+            // print some more
+            for (int i = currentNumberOfChannelsPrinted; i < numberOfChannelsToPrint; i++)
+            {
+                QString string;
+                string.setNum((i+1));
+                string = "Channel" + string;
+                ui->cbChannels->insertItem(i, string, i);
+            }
+        }
+        else
+        {
+            // stop printing some
+            for (int i = currentNumberOfChannelsPrinted; i > numberOfChannelsToPrint; i--)
+            {
+                ui->cbChannels->removeItem(i-1); // carefult, last index is currentNumberOfChannelsPrinted - 1
+            }
+        }
+    }
+
+}
+
+void AsciiReaderSettings::putDatasResizingSettingsInIHM(bool b, int a, float m)
+{
+    ui->cbEnableResizing->setChecked(b);
+    ui->sbAdder->setValue(a);
+    ui->sbMultiplicator->setValue(m);
 }

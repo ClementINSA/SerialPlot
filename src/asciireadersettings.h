@@ -42,20 +42,28 @@ public:
 
     void printAsciiMessages(QString);
 
+    void putChannelsInDataResizerSelector(int numberOfChannelsToPrint);
+    void putDatasResizingSettingsInIHM(bool b, int a, float m);
+
 signals:
     void numOfChannelsChanged(unsigned);
     void channelsSequenceChanged(QString);
     void valuesSeparatorChanged(QChar);
     void regexChanged(QRegExp, bool);
+    void dataResizingChanged(int, bool, int, float);
+    void dataResizingCurrentChannelChanged(int);
 
 private:
     Ui::AsciiReaderSettings *ui;
+    int previousIndex;
 
 private slots:
     void onValuesSeparatorEdited();
     void onChannelsSequenceEdited();
     void onRegexEdited();
     void onRegexChecked(bool);
+    void onDataResizingChanged();
+    void onDataResizingChannelChanged(int channel);
 };
 
 #endif // ASCIIREADERSETTINGS_H

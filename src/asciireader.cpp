@@ -67,6 +67,10 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
             this, &AsciiReader::onChannelsSequenceChanged);
 
     connect(&_settingsWidget, &AsciiReaderSettings::regexChanged, this, &AsciiReader::onRegexChanged);
+
+    // for datas resizing
+    connect(&_settingsWidget, &AsciiReaderSettings::dataResizingChanged, this, &AsciiReader::onDataResizingSettingsChanged);
+    connect(&_settingsWidget, &AsciiReaderSettings::dataResizingCurrentChannelChanged, this, &AsciiReader::onDataResizingChannelChanged);
 }
 
 QWidget* AsciiReader::settingsWidget()
@@ -165,7 +169,7 @@ void AsciiReader::onDataReady()
         auto separatedValues = line.split(valuesSeparator.toLatin1());
 
         // channels counting
-        unsigned numReadChannels; // effective number of channels to read
+        unsigned numReadChannels; // effective number of channels to read       
         unsigned numComingChannels = separatedValues.length();
         if (autoNumOfChannels)
         {
@@ -187,8 +191,14 @@ void AsciiReader::onDataReady()
             qWarning() << "Incoming data is missing data for some channels!";
         }
 
+        // updating data Resizer selector
+        _settingsWidget.putChannelsInDataResizerSelector(numReadChannels);
+
         // parsing read line
         separatedValues = reOrderChannels(separatedValues, channelsSequence, numReadChannels);
+
+        // applying datas resizing
+        separatedValues = reSizeChannels(separatedValues, dataResizerSettings);
 
         // ploting datas
         for (int ci = 0; ci < numReadChannels; ci++)
@@ -467,6 +477,19 @@ QList<QByteArray> AsciiReader::reOrderChannels(QList<QByteArray> currentSequence
     return reOrderredChannels;
 }
 
+QList<QByteArray> AsciiReader::reSizeChannels (QList<QByteArray>currentSamples, QMap<int,ResizingDatas> resizingSettings)
+{
+    QList<QByteArray> resizedSamples = currentSamples;
+    for (int i = 0; i < currentSamples.length(); i++)
+    {
+        if (resizingSettings.count(i) == 1)
+        {
+            resizedSamples[i].setNum(resizingSettings[i].getModifiedValue(resizedSamples[i].toDouble()), 'f',1);
+        }
+    }
+    return resizedSamples;
+}
+
 int AsciiReader::checkUserChannel(int userChannel, int channelMax)
 {
     // If user channel is reachable, give back the user channel (shift by 1 cause user count from 1)
@@ -475,4 +498,29 @@ int AsciiReader::checkUserChannel(int userChannel, int channelMax)
     if (userChannel > 0 && userChannel < channelMax) newChannel = userChannel - 1;
     else newChannel = 0;
     return newChannel;
+}
+
+void AsciiReader::onDataResizingSettingsChanged(int channel, bool activated, int adder, float multiplier)
+{
+    if (channel >= 0)
+    {
+        if (dataResizerSettings.count(channel) == 1)
+        {
+            // this channel has already been set : just update it
+            dataResizerSettings[channel].setSizingDatas(activated, adder, multiplier);
+        }
+        else
+        {
+            // this channel has never been set : create it
+            ResizingDatas newDatas (activated, adder, multiplier);
+            dataResizerSettings.insert(channel, newDatas);
+        }
+    }
+}
+
+void AsciiReader::onDataResizingChannelChanged(int channel)
+{
+    _settingsWidget.putDatasResizingSettingsInIHM( dataResizerSettings[channel].getActivated(),
+                                                   dataResizerSettings[channel].getAdder(),
+                                                   dataResizerSettings[channel].getMultiplier());
 }
