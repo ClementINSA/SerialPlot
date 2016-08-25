@@ -150,11 +150,8 @@ void AsciiReader::onDataReady()
         }
 
         // discard line if not matching with regex
-        if (regexActivated == true && theRegexp.indexIn(line.trimmed().constData()) == -1)
+        if (regexActivated == true && theRegexp.indexIn(line.constData()) == -1)
         {
-            // for debug only
-            std::cerr << "line deleted";
-            std::cerr << line.constData()<< std::endl;
             continue;
         }
 
@@ -318,7 +315,6 @@ void AsciiReader::onChannelsSequenceChanged(QString line)
 
 void AsciiReader::onRegexChanged(QRegExp newRegex, bool newEnable)
 {
-    std::cerr << "regex updated" << std::endl;
     if (newEnable == false)
     {
         regexActivated = false;

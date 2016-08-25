@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
+    <width>473</width>
     <height>183</height>
    </rect>
   </property>
@@ -30,7 +30,7 @@
       <widget class="QListView" name="lvChannelNames">
        <property name="maximumSize">
         <size>
-         <width>16777215</width>
+         <width>200</width>
          <height>170</height>
         </size>
        </property>
