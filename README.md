@@ -8,10 +8,19 @@ Small and simple software for plotting data from serial port in realtime.
 * Reading data from serial port
 * Binary data formats (u)int8, (u)int16, (u)int32, float
 * User defined frame format for robust operation
-* ASCII input (Comma Separated Values)
+* ASCII input (Comma Separated Values) (has been modified, see below)
 * Synchronized multi channel plotting
 * Define and send commands to the device in ASCII or binary format
 * Take snapshots of the current waveform and save to CSV file
+
+##Features added on 26/08/2016
+All the features added are relationned to ASCII input
+* Selection of value separator 
+* Data cleaning (from non numeric characters)
+* Channels sequence can be chosen
+* Trigger (to lauch acquisition on overpassing or underpassing a level)
+* Discard lines not matching with a regex
+* Data Resizing (by addition and multiplication)
 
 See
 [hackaday.io](https://hackaday.io/project/5334-serialplot-realtime-plotting-software)
