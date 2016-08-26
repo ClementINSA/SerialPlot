@@ -2,7 +2,7 @@
   This file is put here for working with QtCreator. When building with
   CMake an auto generated version is used instead.
 
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2015 Hasan Yavuz Özderya and Clément Chaduc
 
   This file is part of serialplot.
 
@@ -21,7 +21,7 @@
 */
 
 #define MAJOR_VERSION    0
-#define MINOR_VERSION    1
+#define MINOR_VERSION    2
 #define PATCH_VERSION    0
-#define VERSION_STRING   "0.1.0"
+#define VERSION_STRING   "0.2.0"
 #define VERSION_REVISION "0"

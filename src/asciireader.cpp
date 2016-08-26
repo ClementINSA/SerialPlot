@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya and Clément Chaduc
 
   This file is part of serialplot.
 
