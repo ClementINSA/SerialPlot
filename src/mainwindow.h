@@ -77,6 +77,7 @@ private:
     ChannelManager channelMan;
 
     QLabel spsLabel;
+    QLabel triggerLabel;
 
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
@@ -108,7 +109,8 @@ private slots:
     void printMessages(QString msg);
 
     void onTriggerUpdated();
-
+    void onTriggerWaited();
+    void onTriggerLauched();
     void onTriggerFinished();
 
 };

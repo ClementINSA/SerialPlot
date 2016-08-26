@@ -172,6 +172,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // stop plotting when trigger is finished
     connect(&dataFormatPanel.asciiReader, &AsciiReader::triggerHasFinished, this, &MainWindow::onTriggerFinished);
 
+    // updating triggerlabbel in status bar
+    connect(&dataFormatPanel.asciiReader, &AsciiReader::triggerHasBeenLauched, this, &MainWindow::onTriggerLauched);
+    connect(&dataFormatPanel.asciiReader, &AsciiReader::triggerIsWaited, this, &MainWindow::onTriggerWaited);
+
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
@@ -185,6 +189,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // init auto scale
     ui->plot->setAxis(plotControlPanel.autoScale(),
                       plotControlPanel.yMin(), plotControlPanel.yMax());
+
+    // Init trigger label
+    triggerLabel.setText("trigger : none");
+    triggerLabel.setToolTip("no trigger acivated : click Trigger to set it");
+    ui->statusBar->addPermanentWidget(&triggerLabel);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
@@ -468,16 +477,39 @@ void MainWindow::onTriggerUpdated()
     dataFormatPanel.asciiReader.setTriggerPosition(triggerSetting.readTriggerPosition());
     dataFormatPanel.asciiReader.setTriggerWindowSize(plotControlPanel.numOfSamples());
 
+    if (triggerSetting.readTriggerStatus())
+    {
+        triggerLabel.setText("trigger : watching");
+        triggerLabel.setToolTip("trigger is waiting for it starting condition");
+    }
+    else
+    {
+        triggerLabel.setText("trigger : none");
+        triggerLabel.setToolTip("no trigger acivated : click Trigger to set it");
+    }
+
     // To restart an acquisition
     ui->actionPause->setChecked(false);
     dataFormatPanel.pause(false);
-
-    // To stop plotting before trigger lauching
     dataFormatPanel.asciiReader.setTriggerLauch(false);
 }
 
 void MainWindow::onTriggerFinished()
 {
     ui->actionPause->setChecked(true);
+
+    triggerLabel.setText("trigger : held");
+    triggerLabel.setToolTip("plotting is paused due to trigger finished\nClick pause button to continue");
 }
 
+void MainWindow::onTriggerLauched()
+{
+    triggerLabel.setText("trigger : hooked");
+    triggerLabel.setToolTip("plotting well be paused when all the expected samples are printed");
+}
+
+void MainWindow::onTriggerWaited()
+{
+    triggerLabel.setText("trigger : watching");
+    triggerLabel.setToolTip("trigger is waiting for it starting condition");
+}

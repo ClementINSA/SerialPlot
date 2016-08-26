@@ -57,7 +57,8 @@ signals :
     void messagePrinting(QString);
     void triggerHasFinished();
     void channelNameChanged(unsigned channel, QString name);
-
+    void triggerHasBeenLauched();
+    void triggerIsWaited();
 
 private:
     AsciiReaderSettings _settingsWidget;
@@ -93,6 +94,7 @@ private:
     int triggerPosition;
     int triggerWindowSize;
 
+    bool triggerPreLauchFirstTime;
     bool triggerPreLauch;
     bool triggerLauch;
     int remainingSamples;

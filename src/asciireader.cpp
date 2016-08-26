@@ -39,7 +39,7 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     remainingSamples = 100;
 
     triggerLauch = false;
-    triggerLauch = false;
+    triggerPreLauchFirstTime = true;
 
     regexActivated = false;
     theRegexp;
@@ -243,6 +243,12 @@ void AsciiReader::onDataReady()
             double sample = separatedValues[channelToWatch].toDouble(&ok);  // TODO : user can chose channel : we have to check his choice !!!!
             if (ok)
             {
+                if (triggerPreLauchFirstTime == true)
+                {
+                    emit triggerIsWaited();
+                    triggerPreLauchFirstTime = false;
+                }
+
                 if (triggerPreLauch == false)
                 {
                     if ((triggerType == true && sample < triggerLevel) || (triggerType == false && sample > triggerLevel))
@@ -257,6 +263,9 @@ void AsciiReader::onDataReady()
                         triggerLauch = true;
                         remainingSamples = (triggerWindowSize - (triggerPosition*triggerWindowSize)/100);
                         triggerPreLauch = false;
+                        triggerPreLauchFirstTime = true;
+
+                        emit triggerHasBeenLauched();
                     }
                 }
             }
@@ -428,6 +437,7 @@ void AsciiReader::setTriggerLauch(bool lauch)
 {
     triggerLauch = lauch;
     triggerPreLauch = lauch;
+    triggerPreLauchFirstTime = true;
 }
 
 bool AsciiReader::cleanPlot()
