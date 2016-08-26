@@ -516,6 +516,9 @@ void AsciiReader::onDataResizingSettingsChanged(int channel, bool activated, int
             dataResizerSettings.insert(channel, newDatas);
         }
     }
+
+    QString name = dataResizerSettings[channel].getModifiedChannelName(channel+1);
+    emit channelNameChanged(channel,name);
 }
 
 void AsciiReader::onDataResizingChannelChanged(int channel)

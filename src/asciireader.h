@@ -56,6 +56,8 @@ public slots:
 signals :
     void messagePrinting(QString);
     void triggerHasFinished();
+    void channelNameChanged(unsigned channel, QString name);
+
 
 private:
     AsciiReaderSettings _settingsWidget;
@@ -115,7 +117,7 @@ private slots:
     void onMessagePrinting(QString);
     void onRegexChanged(QRegExp, bool);
     void onDataResizingSettingsChanged(int channel, bool activated, int adder, float multiplier);
-    void onDataResizingChannelChanged(int channelda);
+    void onDataResizingChannelChanged(int channel);
 };
 
 #endif // ASCIIREADER_H

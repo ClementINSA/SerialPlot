@@ -66,7 +66,9 @@ QString ResizingDatas::getModifiedChannelName(int channelNumber)
 QString ResizingDatas::getModifiedChannelName(QString currentChannelName)
 {
     updateSuffix();
-    QString newChannelName = '(' + currentChannelName + suffix;
+    QString newChannelName;
+    if (activated == true) newChannelName = '(';
+    newChannelName = newChannelName + currentChannelName + suffix;
     return newChannelName;
 }
 

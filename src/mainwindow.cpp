@@ -157,6 +157,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&channelMan, &ChannelManager::channelNameChanged,
             this, &MainWindow::onChannelNameChanged);
 
+    connect(&dataFormatPanel.asciiReader, &AsciiReader::channelNameChanged,
+            this,&MainWindow::onChannelNameChanged);
+
     plotControlPanel.setChannelNamesModel(channelMan.channelNames());
 
     // writing in the Log-Message window
